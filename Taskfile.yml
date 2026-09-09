@@ -1,0 +1,80 @@
+version: "3"
+
+vars:
+  BINARY: curlew
+  CMD: ./cmd/curlew
+  DIST: dist
+
+env:
+  CGO_ENABLED: "1"
+
+tasks:
+  default:
+    desc: Show the available tasks
+    cmd: task --list
+    silent: true
+
+  all:
+    desc: Fix everything fixable, then verify. Run this before committing
+    aliases: [a]
+    cmds:
+      - task: fix
+      - task: check
+
+  fix:
+    desc: Tidy go.mod, format the code and apply every auto-fixable lint rule
+    aliases: [f]
+    cmds:
+      - go mod tidy
+      - golangci-lint fmt
+      - golangci-lint run --fix
+
+  check:
+    desc: Verify without changing anything, the same gates CI enforces
+    aliases: [c, ci]
+    cmds:
+      - go mod tidy -diff
+      - task: lint
+      - task: test
+
+  lint:
+    desc: Run golangci-lint
+    aliases: [l]
+    cmd: golangci-lint run
+    sources: ["**/*.go", .golangci.yml, go.mod, go.sum]
+
+  test:
+    desc: Run all tests with the race detector
+    aliases: [t]
+    cmd: go test -race -count=1 ./...
+
+  run:
+    desc: Run the app from source
+    aliases: [r]
+    cmd: go run {{.CMD}}
+
+  build:
+    desc: Build the binary into ./dist for the host platform
+    aliases: [b]
+    cmds:
+      - mkdir -p {{.DIST}}
+      - go build -trimpath -o {{.DIST}}/{{.BINARY}}{{exeExt}} {{.CMD}}
+    sources: ["**/*.go", go.mod, go.sum]
+    generates: ["{{.DIST}}/{{.BINARY}}{{exeExt}}"]
+
+  migrate:new:
+    desc: Create an empty SQL migration (task migrate:new NAME=add_history)
+    aliases: [m]
+    requires:
+      vars: [NAME]
+    cmd: |
+      dir=internal/db/migrations
+      next=$(printf "%05d" $(( $(ls "$dir"/*.sql 2>/dev/null | wc -l) + 1 )))
+      file="$dir/${next}_{{.NAME}}.sql"
+      printf '%s\n' '-- +goose Up' '' '-- +goose Down' > "$file"
+      echo "created $file"
+
+  clean:
+    desc: Remove build output and caches
+    aliases: [cl]
+    cmd: rm -rf {{.DIST}} coverage.out .task

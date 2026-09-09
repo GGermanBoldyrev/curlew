@@ -1,0 +1,21 @@
+Website = "https://github.com/GGermanBoldyrev/curlew"
+
+[Details]
+Icon = "../../assets/icon.png"
+Name = "Curlew"
+ID = "io.github.ggermanboldyrev.curlew"
+Version = "0.1.0"
+Build = 1
+
+[Source]
+Repo = "https://github.com/GGermanBoldyrev/curlew"
+Dir = "cmd/curlew"
+
+[LinuxAndBSD]
+GenericName = "API Client"
+Categories = ["Development", "Network"]
+Comment = "Send, save and organise HTTP requests"
+Keywords = ["http", "api", "rest", "client", "curl"]
+
+[Migrations]
+fyneDo = true

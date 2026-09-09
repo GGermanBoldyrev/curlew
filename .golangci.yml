@@ -1,0 +1,224 @@
+version: "2"
+
+run:
+  timeout: 5m
+  tests: true
+  modules-download-mode: readonly
+  relative-path-mode: gomod
+  go: "1.26"
+
+linters:
+  default: all
+  disable:
+    - exhaustruct
+    - err113
+    - varnamelen
+    - wsl
+    - wsl_v5
+    - nlreturn
+    - godot
+    - godoclint
+    - goheader
+    - ireturn
+    - noinlineerr
+
+  settings:
+    errcheck:
+      check-type-assertions: true
+      check-blank: true
+
+    govet:
+      enable-all: true
+      disable:
+        - fieldalignment
+
+    staticcheck:
+      checks:
+        - all
+        - -ST1000
+        - -ST1003
+
+    revive:
+      enable-default-rules: true
+      rules:
+        - name: exported
+          disabled: true
+        - name: package-comments
+          disabled: true
+        - name: blank-imports
+          disabled: true
+        - name: line-length-limit
+          arguments: [120]
+        - name: cognitive-complexity
+          arguments: [20]
+
+    gocritic:
+      enabled-tags:
+        - diagnostic
+        - style
+        - performance
+      disabled-checks:
+        - hugeParam
+        - rangeValCopy
+        - unnamedResult
+
+    gocognit:
+      min-complexity: 20
+
+    gocyclo:
+      min-complexity: 15
+
+    cyclop:
+      max-complexity: 15
+      package-average: 8.0
+
+    funlen:
+      lines: 80
+      statements: 50
+
+    nestif:
+      min-complexity: 5
+
+    maintidx:
+      under: 20
+
+    dupl:
+      threshold: 150
+
+    lll:
+      line-length: 120
+      tab-width: 4
+
+    goconst:
+      min-len: 3
+      min-occurrences: 3
+      numbers: true
+      find-duplicates: true
+
+    nakedret:
+      max-func-lines: 0
+
+    nolintlint:
+      require-explanation: true
+      require-specific: true
+      allow-unused: false
+
+    exhaustive:
+      default-signifies-exhaustive: false
+
+    interfacebloat:
+      max: 6
+
+    misspell:
+      locale: US
+
+    wrapcheck:
+      ignore-package-globs:
+        - github.com/GGermanBoldyrev/curlew/*
+
+    sloglint:
+      no-mixed-args: true
+      kv-only: false
+      attr-only: true
+      context: scope
+      static-msg: true
+      key-naming-case: snake
+
+    tagliatelle:
+      case:
+        rules:
+          json: snake
+          yaml: snake
+          db: snake
+
+    forbidigo:
+      analyze-types: true
+      forbid:
+        - pattern: "^(fmt\\.Print(f|ln)?|print|println)$"
+          msg: use log/slog instead of writing to stdout
+
+    depguard:
+      rules:
+        global:
+          deny:
+            - pkg: github.com/pkg/errors
+              desc: use stdlib errors with fmt.Errorf and %w
+            - pkg: io/ioutil
+              desc: deprecated since Go 1.16, use io and os
+            - pkg: math/rand$
+              desc: use math/rand/v2, or crypto/rand for anything security related
+            - pkg: golang.org/x/exp/slices
+              desc: use the stdlib slices package
+            - pkg: golang.org/x/exp/maps
+              desc: use the stdlib maps package
+        core-stays-headless:
+          files:
+            - "**/internal/**"
+            - "!**/internal/ui/**"
+            - "!**/internal/app/**"
+          deny:
+            - pkg: fyne.io
+              desc: the request engine, domain and storage must stay usable without a GUI
+        domain-is-pure:
+          files:
+            - "**/internal/domain/**"
+          deny:
+            - pkg: github.com/GGermanBoldyrev/curlew/internal
+              desc: the domain is the dependency-free kernel and must not import sibling packages
+
+  exclusions:
+    generated: lax
+    warn-unused: true
+    presets:
+      - comments
+      - std-error-handling
+      - common-false-positives
+    rules:
+      - path: _test\.go
+        linters:
+          - dupl
+          - funlen
+          - gocognit
+          - gocyclo
+          - cyclop
+          - maintidx
+          - goconst
+          - gosec
+          - noctx
+          - containedctx
+          - forbidigo
+          - wrapcheck
+          - errcheck
+      - path: internal/ui/
+        linters:
+          - mnd
+          - paralleltest
+
+formatters:
+  enable:
+    - gofumpt
+    - gci
+    - golines
+
+  settings:
+    gofumpt:
+      extra-rules: true
+    gci:
+      custom-order: true
+      sections:
+        - standard
+        - default
+        - localmodule
+        - blank
+        - dot
+    golines:
+      max-len: 120
+      tab-len: 4
+
+  exclusions:
+    generated: strict
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0
+  uniq-by-line: false

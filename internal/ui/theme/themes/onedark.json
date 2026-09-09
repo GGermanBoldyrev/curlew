@@ -1,0 +1,27 @@
+{
+  "variant": "dark",
+  "colors": {
+    "background": "#282C34",
+    "foreground": "#ABB2BF",
+    "primary": "#61AFEF",
+    "hyperlink": "#61AFEF",
+    "focus": "#61AFEF",
+    "button": "#2C313A",
+    "disabledButton": "#21252B",
+    "disabled": "#5C6370",
+    "placeholder": "#5C6370",
+    "scrollBar": "#5C6370",
+    "error": "#E06C75",
+    "success": "#98C379",
+    "warning": "#E5C07B",
+    "hover": "#3E4451",
+    "pressed": "#3E4451",
+    "selection": "#3E4451",
+    "separator": "#181A1F",
+    "inputBorder": "#181A1F",
+    "inputBackground": "#21252B",
+    "menuBackground": "#21252B",
+    "overlayBackground": "#21252B",
+    "headerBackground": "#21252B"
+  }
+}
